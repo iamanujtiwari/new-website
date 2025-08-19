@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Analyst</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+            background: #0a0a0a;
+            color: #fff;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #00ffff;
+        }
+
+        /* Hamburger Menu */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            z-index: 1002;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #00ffff;
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 3px;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -8px);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 300px;
+            height: 100vh;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            transition: right 0.3s ease;
+            z-index: 1001;
+            padding: 100px 30px 30px;
+            border-left: 1px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .mobile-menu a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 15px 0;
+            font-size: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .mobile-menu a:hover {
+            color: #00ffff;
+            padding-left: 10px;
+        }
+
+        /* Overlay */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .menu-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 72px;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient 3s ease infinite;
+        }
+
+        @keyframes gradient {
+            0%, 100% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(180deg); }
+        }
+
+        .subtitle {
+            font-size: 24px;
+            color: #aaa;
+            margin-bottom: 40px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 18px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.5);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #fff;
+            border: 2px solid #00ffff;
+        }
+
+        .btn-secondary:hover {
+            background: #00ffff;
+            color: #000;
+        }
+
+        .section {
+            padding: 100px 50px;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 50px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: #00ffff;
+            box-shadow: 0 20px 40px rgba(0, 255, 255, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 50px 0;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 18px;
+            color: #aaa;
+            margin-top: 10px;
+        }
+
+        #data-viz {
+            height: 400px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            margin: 30px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .floating-particles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 48px; }
+            .nav-links { display: none; }
+            .menu-toggle { display: flex; }
+            .features { grid-template-columns: 1fr; }
+            .cta-buttons { flex-direction: column; }
+            nav { padding: 20px 30px; }
+            .section { padding: 80px 30px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <nav>
+        <div class="logo">Anuj Tiwari</div>
+        <div class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#features">Features</a>
+            <a href="#visualizations">Visualizations</a>
+            <a href="#about">About</a>
+            <a href="contact.html">Contact</a>
+        </div>
+        <div class="menu-toggle" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <div class="menu-overlay" onclick="toggleMenu()"></div>
+    <div class="mobile-menu">
+        <a href="#home" onclick="toggleMenu()">Home</a>
+        <a href="#features" onclick="toggleMenu()">Features</a>
+        <a href="#visualizations" onclick="toggleMenu()">Visualizations</a>
+        <a href="#about" onclick="toggleMenu()">About</a>
+        <a href="#contact" onclick="toggleMenu()">Contact</a>
+    </div>
+
+    <section class="hero" id="home">
+        <h1>Data Analyst in 3D</h1>
+        <p class="subtitle">Visualize, Analyze, and Explore Data in Three Dimensions</p>
+        <div class="cta-buttons">
+            <button class="btn btn-primary" onclick="startDemo()">Start Demo</button>
+            <button class="btn btn-secondary" onclick="scrollToFeatures()">Learn More</button>
+        </div>
+    </section>
+
+    <section class="section" id="features">
+        <h2 style="font-size: 48px; text-align: center; margin-bottom: 20px;">Features</h2>
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">💻</div>
+                <h3>Data Cleaning & Preparation</h3>
+                <p>Raw data ko clean, normalize aur transform analysis- (missing values, duplicates, outliers handle)</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"></div>
+                <h3>Reporting & Dashboards</h3>
+                <p>Power BI/Tableau/Looker me interactive dashboards aur automated reports banata hoon for KPIs.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Excel/Sheets Automation</h3>
+                <p>Advanced formulas, Pivot Tables, Power Query/VBA se daily reporting automate </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔬</div>
+                <h3>Statistical Analysis</h3>
+                <p>Interactive 3D plots for regression analysis, clustering, and dimensionality reduction techniques.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Forecasting</h3>
+                <p>Build and visualize predictive models with intuitive 3D interfaces and real-time feedback.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌐</div>
+                <h3>SQL Data Extraction</h3>
+                <p></p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2 style="font-size: 48px; text-align: center; margin-bottom: 20px;">Live Statistics</h2>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number" >-</div>
+                <div class="stat-label">Datasets Processed</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" >-</div>
+                <div class="stat-label">Models Trained</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" >-</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" >-</div>
+                <div class="stat-label">Avg. Accuracy</div>
+            </div>
+        </div>
+    
+    </section>
+
+    <section class="section" id="visualizations">
+        <h2 style="font-size: 48px; text-align: center; margin-bottom: 20px;">Interactive Visualization</h2>
+        <div id="data-viz">
+            <canvas id="viz-canvas"></canvas>
+        </div>
+        <p style="text-align: center; color: #aaa;">Click and drag to rotate • Scroll to zoom</p>
+     
+    </section>
+        <footer class="bg-gray-800 text-white text-center py-4">
+    <p>&copy; 2025 Anuj Tiwari. All rights reserved.</p>
+  </footer>
+    <script>
+        // Three.js Scene Setup
+        let scene, camera, renderer;
+        let particles, dataPoints, connections;
+        let mouseX = 0, mouseY = 0;
+
+        function initThreeJS() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // Create particle system
+            const geometry = new THREE.BufferGeometry();
+            const vertices = [];
+            const colors = [];
+
+            for (let i = 0; i < 1000; i++) {
+                vertices.push(
+                    Math.random() * 100 - 50,
+                    Math.random() * 100 - 50,
+                    Math.random() * 100 - 50
+                );
+                colors.push(Math.random(), Math.random(), Math.random());
+            }
+
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 2,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8
+            });
+
+            particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+
+            // Create data visualization mesh
+            const dataGeometry = new THREE.IcosahedronGeometry(10, 1);
+            const dataMaterial = new THREE.MeshBasicMaterial({
+                color: 0x00ffff,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.3
+            });
+            dataPoints = new THREE.Mesh(dataGeometry, dataMaterial);
+            scene.add(dataPoints);
+
+            // Create connections
+            const connectionGeometry = new THREE.BufferGeometry();
+            const connectionVertices = [];
+            
+            for (let i = 0; i < 50; i++) {
+                const x1 = Math.random() * 40 - 20;
+                const y1 = Math.random() * 40 - 20;
+                const z1 = Math.random() * 40 - 20;
+                const x2 = Math.random() * 40 - 20;
+                const y2 = Math.random() * 40 - 20;
+                const z2 = Math.random() * 40 - 20;
+                
+                connectionVertices.push(x1, y1, z1, x2, y2, z2);
+            }
+            
+            connectionGeometry.setAttribute('position', new THREE.Float32BufferAttribute(connectionVertices, 3));
+            const connectionMaterial = new THREE.LineBasicMaterial({
+                color: 0xff00ff,
+                transparent: true,
+                opacity: 0.2
+            });
+            connections = new THREE.LineSegments(connectionGeometry, connectionMaterial);
+            scene.add(connections);
+
+            camera.position.z = 50;
+
+            // Mouse movement
+            document.addEventListener('mousemove', onMouseMove);
+
+            animate();
+        }
+
+        function onMouseMove(event) {
+            mouseX = (event.clientX - window.innerWidth / 2) * 0.001;
+            mouseY = (event.clientY - window.innerHeight / 2) * 0.001;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            particles.rotation.x += 0.001;
+            particles.rotation.y += 0.002;
+
+            dataPoints.rotation.x += 0.005;
+            dataPoints.rotation.y += 0.005;
+
+            connections.rotation.z += 0.002;
+
+            camera.position.x += (mouseX * 20 - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY * 20 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
+        }
+
+        // Initialize visualization canvas
+        function initDataViz() {
+            const canvas = document.getElementById('viz-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = document.getElementById('data-viz').offsetWidth;
+            canvas.height = 400;
+
+            let time = 0;
+            
+            function drawViz() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.strokeStyle = '#00ffff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+
+                for (let x = 0; x < canvas.width; x += 5) {
+                    const y = canvas.height / 2 + Math.sin((x + time) * 0.02) * 50 * Math.cos(time * 0.01);
+                    if (x === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.stroke();
+
+                ctx.strokeStyle = '#ff00ff';
+                ctx.beginPath();
+                for (let x = 0; x < canvas.width; x += 5) {
+                    const y = canvas.height / 2 + Math.cos((x + time) * 0.02) * 50 * Math.sin(time * 0.01);
+                    if (x === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.stroke();
+
+                time += 2;
+                requestAnimationFrame(drawViz);
+            }
+
+            drawViz();
+        }
+
+        // Animate statistics
+        function animateStats() {
+            animateValue('datasets', 0, 15420, 2000);
+            animateValue('models', 0, 3847, 2000);
+            animateValue('users', 0, 28930, 2000);
+            animateValue('accuracy', 0, 97, 2000, '%');
+        }
+
+        function animateValue(id, start, end, duration, suffix = '') {
+            const obj = document.getElementById(id);
+            const range = end - start;
+            const increment = end > start ? 1 : -1;
+            const stepTime = Math.abs(Math.floor(duration / range));
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment * Math.ceil(range / 100);
+                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                obj.textContent = current.toLocaleString() + suffix;
+            }, stepTime);
+        }
+
+        function startDemo() {
+            alert('Demo visualization would start here! This would launch an interactive 3D data exploration tool.');
+        }
+
+        function scrollToFeatures() {
+            document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Mobile menu toggle
+        function toggleMenu() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const menuOverlay = document.querySelector('.menu-overlay');
+            
+            menuToggle.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            menuOverlay.classList.toggle('active');
+            
+            // Prevent body scroll when menu is open
+            if (mobileMenu.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Window resize handler
+        window.addEventListener('resize', () => {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        });
+
+        // Initialize everything
+        window.addEventListener('load', () => {
+            initThreeJS();
+            initDataViz();
+            animateStats();
+        });
+    </script>
+</body>
+</html>
