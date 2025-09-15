@@ -307,6 +307,158 @@
             nav { padding: 20px 30px; }
             .section { padding: 80px 30px; }
         }
+         /* Contact Section */
+    .contact-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 50px 20px;
+      background: url('https://www.transparenttextures.com/patterns/stardust.png');
+      background-size: cover;
+    }
+
+    .contact-section h1 {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #ff6a00;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .form-container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 25px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0px 4px 20px rgba(0,0,0,0.3);
+      animation: fadeInUp 1s ease-in-out;
+    }
+
+    .form-container h2 {
+      margin-bottom: 15px;
+      font-size: 1.5rem;
+      color: #00ffcc;
+      text-align: center;
+    }
+
+    .form-container label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+    }
+
+    .form-container input,
+    .form-container textarea {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0 15px 0;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    .form-container input:focus,
+    .form-container textarea:focus {
+      border: 2px solid #00ffcc;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .form-container button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #ff6a00, #ee0979);
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .form-container button:hover {
+      transform: scale(1.05);
+      background: linear-gradient(90deg, #ee0979, #ff6a00);
+    }
+
+    /* Contact Info */
+    .contact-info {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 1rem;
+    }
+
+    .contact-info p {
+      margin: 8px 0;
+    }
+
+    .contact-info a {
+      color: #00ffcc;
+      text-decoration: none;
+    }
+
+    /* Footer */
+    footer {
+      background: #111;
+      color: #ccc;
+      text-align: center;
+      padding: 15px 10px;
+      font-size: 0.9rem;
+    }
+
+    footer a {
+      color: #00ffcc;
+      margin: 0 10px;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    footer a:hover {
+      color: #ff6a00;
+    }
+
+    /* Animation */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+ #typewriter {
+    border-right: 3px solid #00ffcc; /* blinking cursor */
+    white-space: nowrap;
+    overflow: hidden;
+    animation: blink 0.7s infinite;
+    font-size: 2rem; /* default size for desktop */
+    text-align: center;
+    display: block;
+  }
+
+  @keyframes blink {
+    50% { border-color: transparent; }
+  }
+
+  /* 📱 Responsive for smaller screens */
+  @media (max-width: 768px) {
+    #typewriter {
+      font-size: 1.5rem;
+      white-space: normal; /* allow wrapping */
+    }
+  }
+
+  @media (max-width: 480px) {
+    #typewriter {
+      font-size: 1.2rem;
+      white-space: normal;
+    }
+  }
+   
+
     </style>
 </head>
 <body>
@@ -319,7 +471,7 @@
             <a href="#features">Features</a>
             <a href="#visualizations">Visualizations</a>
             <a href="#about">About</a>
-            <a href="contact.html">Contact</a>
+            <a href="#contact-info">Contact</a>
         </div>
         <div class="menu-toggle" onclick="toggleMenu()">
             <span></span>
@@ -334,17 +486,28 @@
         <a href="#features" onclick="toggleMenu()">Features</a>
         <a href="#visualizations" onclick="toggleMenu()">Visualizations</a>
         <a href="#about" onclick="toggleMenu()">About</a>
-        <a href="contact.html" onclick="toggleMenu()">Contact</a>
+        <a href="#contact-info" onclick="toggleMenu()">Contact</a>
     </div>
 
     <section class="hero" id="home">
-        <h1>Data Analyst in 3D</h1>
+        <h1 id="typewriter"></h1>
         <p class="subtitle">Visualize, Analyze, and Explore Data in Three Dimensions</p>
         <div class="cta-buttons">
-            <button class="btn btn-primary" onclick="startDemo()">Start Demo</button>
+            <button class="btn btn-primary" onclick="openVideo()">Start Demo</button>
             <button class="btn btn-secondary" onclick="scrollToFeatures()">Learn More</button>
         </div>
+
     </section>
+    <!-- Modal vedio start demo -->
+<div id="videoModal" style="display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.8);justify-content:center;align-items:center;">
+  <div style="position:relative;width:80%;max-width:800px;">
+    <span onclick="closeVideo()" style="position:absolute;top:-35px;right:-10px;font-size:30px;font-weight:bold;color:white;cursor:pointer;">&times;</span>
+    <video id="demoVideo" autoplay loop controls style="width:100%;border-radius:10px;">
+      <source src="data demo vedio.mp4" type="video/mp4">
+      Your browser does not support video.
+    </video>
+  </div>
+</div>
 
     <section class="section" id="features">
         <h2 style="font-size: 48px; text-align: center; margin-bottom: 20px;">Features</h2>
@@ -411,12 +574,130 @@
             <canvas id="viz-canvas"></canvas>
         </div>
         <p style="text-align: center; color: #aaa;">Click and drag to rotate • Scroll to zoom</p>
-     
-    </section>
-        <footer class="bg-gray-800 text-white text-center py-4">
-    <p>&copy; 2025 Anuj Tiwari. All rights reserved.</p>
+        <section class="contact-section">
+
+  <section class="contact-section" id="contact-info">
+    <h1>Contact Us</h1>
+
+    <div class="form-container">
+      <h2>Send us a Message</h2>
+     <form
+  action="https://formspree.io/f/mjkedorv"
+  method="POST"
+>
+  <label>
+    Your email:
+    <input type="email" name="email">
+  </label>
+  <label>
+    Your message:
+    <textarea name="message"></textarea>
+  </label>
+  <!-- your other form fields go here -->
+  <button type="submit">Send</button>
+</form>
+    </div>
+
+    <div class="contact-info">
+      <p>📍 <b>Address:</b> Jaipur, Rajasthan, India</p>
+      <p>📧 <b>Email:</b> <a href="mailto:anujtiwari000@outlook.com">anujtiwari000@outlook.com</a></p>
+      <p>📞 <b>Phone:</b> +91 XXXXXXXXXX</p>
+      <p>🌍 <a href="#">Google Map Embed Here</a></p>
+    </div>
+  </section>
+  <section class="about-section">
+
+  <h1>About Me</h1>
+
+  <div class="form-container" id="about">
+    <h2>Hello, I'm Anuj Tiwari 👋</h2>
+    <p>
+      I’m a passionate <b>software developer</b> and technology enthusiast from 
+      <b>Jaipur, Rajasthan</b>. I enjoy building modern web applications, exploring 
+      <b>data science</b>, and working with <b>AI & cybersecurity</b>.  
+    </p>
+    <p>
+      My journey started with curiosity about how things work behind the screen.  
+      Over time, I’ve learned various programming languages, frameworks, and tools 
+      to bring ideas into reality.  
+    </p>
+    <p>
+      When I’m not coding, I like exploring new tech trends, solving challenges, 
+      and sharing knowledge with others.  
+    </p>
+  </div>
+</section>
+       <h1></h1>
+       <h1></h1>
+  <footer>
+    <p>
+      🔗 <a href="https://www.linkedin.com/in/your-linkedin" target="_blank">LinkedIn</a> |
+      💻 <a href="https://github.com/your-github" target="_blank">GitHub</a>
+    </p>
+    <p>© 2025 Anuj Tiwari. All Rights Reserved.</p>
   </footer>
+
     <script>
+        
+  // Sentences to type
+  const texts = [
+    "Hello, I'm Anuj Tiwari ",
+    "A Software Developer ",
+    "Data Science & Cybersecurity Enthusiast ",
+    "Always Learning New Tech "
+  ];
+
+  let count = 0;
+  let index = 0;
+  let currentText = '';
+  let letter = '';
+
+  function typeWriter() {
+    if (count === texts.length) {
+      count = 0; // restart after last text
+    }
+    currentText = texts[count];
+    letter = currentText.slice(0, ++index);
+
+    document.getElementById('typewriter').textContent = letter;
+
+    if (letter.length === currentText.length) {
+      count++;
+      index = 0;
+      setTimeout(typeWriter, 1500); // pause before next text
+    } else {
+      setTimeout(typeWriter, 100); // typing speed
+    }
+  }
+
+  // Start animation
+  typeWriter();
+
+    // js vedio code 
+    function openVideo() {
+    const modal = document.getElementById("videoModal");
+    const video = document.getElementById("demoVideo");
+    modal.style.display = "flex";
+    video.play();
+  }
+
+  function closeVideo() {
+    const modal = document.getElementById("videoModal");
+    const video = document.getElementById("demoVideo");
+    modal.style.display = "none";
+    video.pause();
+    video.currentTime = 0;
+  }
+
+  // Close modal when clicking outside video
+  window.onclick = function(event) {
+    const modal = document.getElementById("videoModal");
+    const video = document.getElementById("demoVideo");
+    if (event.target === modal) {
+      closeVideo();
+    }
+  };
+
         // Three.js Scene Setup
         let scene, camera, renderer;
         let particles, dataPoints, connections;
